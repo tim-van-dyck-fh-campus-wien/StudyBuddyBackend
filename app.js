@@ -10,11 +10,14 @@ const morgan = require('morgan');
 const session = require('express-session');
 const cors = require('cors');
 
-
 dotenv.config();
-mongoose.connect(process.env.MONGO_URL,{useNewUrlParser:true, useUnifiedTopology:true},()=>{
-    console.log('connected to MongoDB');
-})
+
+//routes
+const authRoute = require('./routes/auth');
+const studyGroupsRoute = require('./routes/studyGroups');
+mongoose.connect(process.env.MONGO_URL,{useNewUrlParser:true, useUnifiedTopology:true}).then( () => console.log("connected to DB."))
+.catch( err => console.log(err));
+//middleware
 app.use(express.json());//parse body 
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
@@ -35,7 +38,8 @@ app.use(cors({
 app.get('/',(req,res)=>{
     res.send("ALL GOOD");
 });
-
+app.use('/api/auth',authRoute);
+app.use('/api/studyGroups',studyGroupsRoute)
 app.listen(3000,()=>{
     console.log("Server started on port 3000");
 });
