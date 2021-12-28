@@ -5,19 +5,22 @@ const StudyGroupSchema = new mongoose.Schema({
     name:{
         type:String,
         require:true,
+        default:"unnamed Group"
     },
-    members:{
-        type:[Student.schema],
+    members:[{
+        type:mongoose.Schema.Types.ObjectId, ref:"Students",
         require:true,
-        min:1
-    },
+        min:1,
+        unique:false
+    }],
    /* appointments:{
         type:[Appointment.schema],
         require:true,
     }*/
-    admin:{
-        type:Student.schema,
-        require:true
+    admin:{//reference to a student
+        type:mongoose.Schema.Types.ObjectId, ref:"Students",
+        require:true,
+        unique:false
     },
     messages:{
         type:[Message.schema],
@@ -25,10 +28,11 @@ const StudyGroupSchema = new mongoose.Schema({
         default:[]
     },
     location:{
-        type:String,
+        type:Number,
         require:true,
         min:1,
-        max:23
+        max:23,
+        default:1
     }
 
 

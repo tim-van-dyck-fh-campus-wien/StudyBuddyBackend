@@ -17,7 +17,7 @@ const StudentSchema = new mongoose.Schema({//Defines the schema for DB entrys in
         type:String,
         required:true,
         max:50,
-        unique:true
+        unique:false
     },
     password:{
         type:String,
