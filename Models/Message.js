@@ -8,7 +8,8 @@ const MessageSchema = new mongoose.Schema({
         require:true
     },
     sender_id:{//_id of the student sending the message
-        type:String,
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"Students",
         require:true
     },
 },{
