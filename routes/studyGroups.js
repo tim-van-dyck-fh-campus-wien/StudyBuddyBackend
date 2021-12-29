@@ -33,7 +33,7 @@ async function getStudyGroup(id){
     return StudyGroup.model.findById(id);
 }
 function checkIfStudentIsAdmin(studyGroup,studentId){
-    if(studyGroup.admin==studentId){
+    if(studyGroup.admin.equals(studentId)){
         return true;
     }else{
         return false;
@@ -45,7 +45,8 @@ router.patch('/addMember', async(req,res)=>{
     !student && res.status(401).send("You are not logged in");
     const studyGroup = await getStudyGroup(req.body.groupId);//find the corresponding study group
     !studyGroup&&res.status(404).send("The study group specified by the id was not found!");
-    if(await checkIfStudentIsAdmin(studyGroup,student._id)){
+    console.log(checkIfStudentIsAdmin(studyGroup,student._id));
+    if(!checkIfStudentIsAdmin(studyGroup,student._id)){
         res.status(401).send("You are not the admin of the study group!")
     }
     const studentToBeAdded = await studentScripts.getStudent(req.body.newMemberId);
@@ -55,6 +56,57 @@ router.patch('/addMember', async(req,res)=>{
     //add to the list of members, but only if it is not yet in the list!
     await StudyGroup.model.updateOne({_id:req.body.groupId},{$addToSet:{members:studentToBeAdded._id}});
     res.status(200).send("Student was added sucessfully");
+})
+router.delete('/deleteMember',async(req,res)=>{
+    const student = await studentScripts.getStudent(req.session.userId);
+    !student && res.status(401).send("You are not logged in");
+    const studyGroup = await getStudyGroup(req.body.groupId);//find the corresponding study group
+    !studyGroup&&res.status(404).send("The study group specified by the id was not found!");
+    if(!checkIfStudentIsAdmin(studyGroup,student._id)){
+        res.status(401).send("You are not the admin of the study group!")
+    }
+    const studentToBeRemoved = await studentScripts.getStudent(req.body.newMemberId);
+    !studentToBeRemoved&&res.status(404).send("The student to be added was not found");
+    if(studentToBeRemoved._id==student._id){//Admin can't remove himself from the group, as there would be no admin
+        res.status(401).send("You can't remove yourself, as there would be no admin!");
+    }
+    await StudyGroup.model.updateOne({_id:studyGroup._id},{$pull:{
+        members:studentToBeRemoved._id
+    }})
+    res.status(200).send("Student was removed from Group!")
+})
+//used to leave a study group, the logged in student is a member of
+router.delete('/leaveStudyGroup',async(req,res)=>{
+    const student = await studentScripts.getStudent(req.session.userId);
+    !student && res.status(401).send("You are not logged in");
+    const studyGroup = await getStudyGroup(req.body.groupId);//find the corresponding study group
+    !studyGroup&&res.status(404).send("The study group specified by the id was not found!");
+    
+    //Student is not the admin, save to remove!
+    if(!checkIfStudentIsAdmin(studyGroup,student._id)){
+        await StudyGroup.model.updateOne({_id:studyGroup._id},{$pull:{
+            members:student._id
+        }})
+        res.status(200).send("You were removed from the studygroup")
+    }else{//If the student is the admin, a new admin must be specified via the request body!
+        !req.body.newAdminId&&res.status(400).send("Please specify the new admin inside the body(newAdminId)");
+        const newAdmin = await studentScripts.getStudent(req.body.newAdminId);
+        !newAdmin&&res.status(404).send("the specified new Admin does not exist, check the ID!");
+        //Check if the new Admin is a member of the studyGroup:
+        const exists = StudyGroup.model.find({member:{
+            $elemMatch:req.body.newAdminId
+        }});
+        !exists&&res.status(404).send("the new Admin is not a member of the studyGroup!");
+        studyGroup.admin=newAdmin._id;//set the new admin
+        await StudyGroup.model.updateOne({_id:studyGroup._id},{$pull:{
+            members:student._id
+        }})//and leave the group
+        res.status(200).send("New Admin was set and you left the group");
+
+
+    }
+    
+    
 })
 
 //Admin functions
