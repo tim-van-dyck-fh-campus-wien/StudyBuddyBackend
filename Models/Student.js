@@ -1,6 +1,14 @@
 const mongoose = require('mongoose');
 
 const StudentSchema = new mongoose.Schema({//Defines the schema for DB entrys inside the USERS database!
+    //added for must criterias
+    username:{
+        type:String,
+        require:true,// a user has to have a username
+        min:3,//atleast 3 characters long
+        max:20,
+        unique:true, //must be unique, otherwise login doesn't work
+    },
     firstname:{
         type:String,
         require:true,// a user has to have a username
@@ -32,14 +40,14 @@ const StudentSchema = new mongoose.Schema({//Defines the schema for DB entrys in
         unique:true
     },
     location:{//District number in vienna
-        type:Number,
+        //changed to string to reduce error possibilities 
+        type:String,
         required:true,
-        min:1,
-        max:23
     },
     yearOfFinish:{//Year when studies will be finished
         type:Number,
-        required:true
+        required:true,
+        min:2022
     }
 },{
     timestamps:true
