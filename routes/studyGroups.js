@@ -2,13 +2,21 @@ const router = require('express').Router();
 const StudyGroup = require('../Models/StudyGroup');
 const studentScripts = require('../tools/studentScripts');
 const Messages = require('../Models/Message')
-router.get('/',async(req,res)=>{//Get list of study groups I am Part of
+
+
+//Get list of study groups I am Part of
+router.get('/',async(req,res)=>{
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("U are not logged in");
     const result = await StudyGroup.model.find({members:student._id});//if I am a member, return in query!
+    console.dir(result);
     res.json(result);
 });
-router.post('/',async(req,res)=>{
+
+//create new study group
+router.post('/create',async(req,res)=>{
+    console.dir('Doing Method:', req);
+    console.dir(req.session.userId);
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("U are not logged in");
     console.log(student);
@@ -18,8 +26,8 @@ router.post('/',async(req,res)=>{
     const location = req.body.location;
     const newStudyGroup = StudyGroup.model({
         name:name,
-        members:members,
         admin:admin,
+        members:members,
         location:location
     });
     try{

@@ -7,32 +7,32 @@ const StudyGroupSchema = new mongoose.Schema({
         require:true,
         default:"unnamed Group"
     },
-    members:[{
-        type:mongoose.Schema.Types.ObjectId, ref:"Students",
-        require:true,
-        min:1,
-        unique:false
-    }],
-   /* appointments:{
-        type:[Appointment.schema],
-        require:true,
-    }*/
     admin:{//reference to a student
         type:mongoose.Schema.Types.ObjectId, ref:"Students",
         require:true,
         unique:false
     },
+    members:[{
+        type:mongoose.Schema.Types.ObjectId, ref:"Students",
+        require:true,
+        min:1,
+        unique:false,
+    }],
+   /* appointments:{
+        type:[Appointment.schema],
+        require:true,
+    }*/
     messages:{
         type:[Message.schema],
         require:true,
         default:[]
     },
     location:{
-        type:Number,
+        type:String,
         require:true,
-        min:1,
+        /**min:1,
         max:23,
-        default:1
+        default:1*/
     }
 
 

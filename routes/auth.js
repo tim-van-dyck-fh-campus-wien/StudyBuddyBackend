@@ -57,7 +57,8 @@ router.post('/register',async(req,res)=>{
                 const student = await newStudent.save();
                 req.session.loggedIn=true;
                 req.session.userId=student._id;
-                res.status(200).json(student, req.session.loggedIn, req.session.userId, student._id);
+                console.dir(student, req.session.loggedIn, req.session.userId, student._id)
+                res.status(200).json(student);
                     } catch (err){
                         res.status(406).json(err);
                     }
@@ -77,8 +78,8 @@ router.post('/register',async(req,res)=>{
 //LOGIN
 router.post('/login',async(req,res)=>{
     try{
-        const student = await Student.findOne({username:req.body.username});//Find the corresponding user to the email
-       // console.log(student);
+        const student = await Student.findOne({username:req.body.username});//Find the corresponding user to the username
+        //console.dir(student);
         !student && res.status(404).send("Email or password not correct");//If no user found
         
         const passwordValid = await bcrypt.compare(req.body.password,student.password);//Compare hash to transmitted password
@@ -88,8 +89,11 @@ router.post('/login',async(req,res)=>{
         //EMAIL AND PASSWORD VALID
         req.session.loggedIn=true;
         req.session.userId=student._id;//Set the student id in the session
+        
+       // console.dir(student);
+        console.dir('SESSION id', req.session.userId, student._id);
         res.status(200).json(student);
-        console.dir(student);
+        
         
     }catch(err){
         res.status(500).json(err);
@@ -97,8 +101,6 @@ router.post('/login',async(req,res)=>{
 })
 
 //UPDATE STUDENT DATA
-
-/**ACHTUNG; VERÄNDERUNGEN GEHEN BEI LOGOUT VERLOREN */
 router.post('/updateStudentData', async(req,res)=>{
     //console.dir(req); 
     try {
