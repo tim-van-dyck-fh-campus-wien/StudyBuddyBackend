@@ -4,7 +4,7 @@ const StudentSchema = new mongoose.Schema({//Defines the schema for DB entrys in
     //added for must criterias
     username:{
         type:String,
-        require:true,// a user has to have a username
+        required:true,// a user has to have a username
         min:3,//atleast 3 characters long
         max:20,
         unique:true, //must be unique, otherwise login doesn't work
