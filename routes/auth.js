@@ -20,6 +20,7 @@ router.get("/checkAuthentication",(req,res)=>{
     }
 })
 
+//CHECK IF USER IS AUTHORIZED TO DO ADMIN STUFF
 router.post("/authorizationCheck", (req,res)=>{
     if(studentScripts.isStudentAdminOfStudyGroup(req.body.groupId, req.session.userId)){
         res.status(200).send();
