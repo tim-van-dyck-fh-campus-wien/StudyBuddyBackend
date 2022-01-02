@@ -8,15 +8,16 @@ const Messages = require('../Models/Message')
 router.get('/',async(req,res)=>{
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("U are not logged in");
-    const result = await StudyGroup.model.find({members:student._id});//if I am a member, return in query!
+    //if I am a member, return in query!
+    const result = await StudyGroup.model.find({members:student._id});
     console.dir(result);
     res.json(result);
 });
 
 //create new study group
 router.post('/create',async(req,res)=>{
-    console.dir('Doing Method:', req);
-    console.dir(req.session.userId);
+    //console.dir('Doing Method:', req);
+    //console.dir(req.session.userId);
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("U are not logged in");
     console.log(student);
@@ -45,6 +46,7 @@ function checkIfStudentIsAdmin(studyGroup,studentId){
         return false;
     }
 }
+
 //Add a student to a study group, specified by the id of the student to be added in the body, and the studygroup id in the body
 router.patch('/addMember', async(req,res)=>{
     const student = await studentScripts.getStudent(req.session.userId);
@@ -63,6 +65,10 @@ router.patch('/addMember', async(req,res)=>{
     await StudyGroup.model.updateOne({_id:req.body.groupId},{$addToSet:{members:studentToBeAdded._id}});
     res.status(200).send("Student was added sucessfully");
 })
+
+
+
+
 router.delete('/deleteMember',async(req,res)=>{
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("You are not logged in");

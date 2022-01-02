@@ -8,6 +8,7 @@ const Messages = require('../Models/Message')
 router.post('/',async(req,res)=>{
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("You are not logged in");
+    console.log(req.body.groupId);
     const studyGroup = await studentScripts.getStudyGroup(req.body.groupId);//find the corresponding study group
     !studyGroup&&res.status(404).send("The study group specified by the id was not found!");
     const studentIsMember = await studentScripts.isStudentMemberOfStudyGroup(req.body.groupId,student._id);
@@ -26,9 +27,10 @@ router.post('/',async(req,res)=>{
 }
 });
 //Used to get the list of messages
-router.get('/',async(req,res)=>{
+router.post('/',async(req,res)=>{
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("You are not logged in");
+    console.log("get ID", req.body.groupId);
     let studyGroup = await studentScripts.getStudyGroup(req.body.groupId);//find the corresponding study group
     !studyGroup&&res.status(404).send("The study group specified by the id was not found!");
     const studentIsMember = await studentScripts.isStudentMemberOfStudyGroup(req.body.groupId,student._id);

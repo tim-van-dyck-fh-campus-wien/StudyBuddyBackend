@@ -2,7 +2,6 @@
 const router = require('express').Router();
 const bcrypt = require('bcrypt');//hashing and salting
 const Student = require('../Models/Student').model;
-//Test für update student
 const studentScripts = require('../tools/studentScripts');
 
 router.get('/',(req,res)=>{
@@ -11,6 +10,7 @@ router.get('/',(req,res)=>{
     }
     res.send('user auth works');
 });
+
 //Check if user with corresponding session id, is logged in!
 router.get("/checkAuthentication",(req,res)=>{
     if(req.session.loggedIn){
@@ -20,6 +20,13 @@ router.get("/checkAuthentication",(req,res)=>{
     }
 })
 
+router.post("/authorizationCheck", (req,res)=>{
+    if(studentScripts.isStudentAdminOfStudyGroup(req.body.groupId, req.session.userId)){
+        res.status(200).send();
+    } else {
+        res.status(400).send();
+    }
+})
 
 //REGISTER
 router.post('/register',async(req,res)=>{
