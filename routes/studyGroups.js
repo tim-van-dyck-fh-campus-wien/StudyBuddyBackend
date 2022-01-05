@@ -9,7 +9,8 @@ router.get('/',async(req,res)=>{
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("U are not logged in");
     //if I am a member, return in query!
-    const result = await StudyGroup.model.find({members:student._id});
+    const result = await StudyGroup.model.find({members:student._id}).select('_id name admin members location').populate('members','_id username firstname lastname email location').populate('admin','_id username firstname lastname email location');
+
     console.dir(result);
     res.json(result);
 });
