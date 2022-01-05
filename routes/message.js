@@ -27,7 +27,7 @@ router.post('/',async(req,res)=>{
 }
 });
 //Used to get the list of messages
-router.post('/',async(req,res)=>{
+router.get('/',async(req,res)=>{
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("You are not logged in");
     console.log("get ID", req.body.groupId);
@@ -48,7 +48,7 @@ router.post('/',async(req,res)=>{
             populate:{
                 path:'sender_id',
                 model:'Students',
-                select:{'firstname':1,'lastname':1,'email':1}
+                select:{'firstname':1,'lastname':1,'email':1,'username':1}
             }
         });
         let messages = studyGroup.messages;

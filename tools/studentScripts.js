@@ -13,10 +13,10 @@ async function getStudyGroup(id){
     return StudyGroup.model.findById(id);
 }
 async function isStudentMemberOfStudyGroup(group_id,student_id){
-    const isMember=await StudyGroup.model.find({members:{
-        $elemMatch:{student_id}
-    },_id:group_id});
-    if(isMember){
+    const isMember=await StudyGroup.model.find({members:
+student_id,
+    _id:group_id});
+    if(isMember.length>=1){
         return true;
     }else{
         return false;

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Student = require('./Student');
-const Message = require('./Message')
+const Message = require('./Message');
+const JoinRequest = require('./JoinRequest');
 const StudyGroupSchema = new mongoose.Schema({
     name:{
         type:String,
@@ -24,6 +25,11 @@ const StudyGroupSchema = new mongoose.Schema({
     }*/
     messages:{
         type:[Message.schema],
+        require:true,
+        default:[]
+    },
+    joinRequests:{
+        type:[JoinRequest.schema],
         require:true,
         default:[]
     },
