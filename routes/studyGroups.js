@@ -4,8 +4,23 @@ const studentScripts = require('../tools/studentScripts');
 const Messages = require('../Models/Message')
 const JoinRequest=require('../Models/JoinRequest');
 
-//Get list of study groups I am Part of
+//get list of all study groups
 router.get('/',async(req,res)=>{
+    const student = await studentScripts.getStudent(req.session.userId);
+    !student && res.status(401).send("U are not logged in");
+    const result = await StudyGroup.model.find().select('_id name admin members location').populate('members','_id username firstname lastname email location').populate('admin','_id username firstname lastname email location');
+    res.json(result);
+});
+
+//Get list of all study groups from a district
+router.get('/:location',async(req,res)=>{
+    const student = await studentScripts.getStudent(req.session.userId);
+    !student && res.status(401).send("U are not logged in");
+    const result = await StudyGroup.model.find({location:req.params.location})
+    res.json(result);
+});
+//Get list of study groups I am Part of
+router.get('/myGroups',async(req,res)=>{
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("U are not logged in");
     //if I am a member, return in query!
