@@ -36,8 +36,12 @@ async function isStudentAdminOfStudyGroup(group_id,student_id){
     }
     console.log(admin);*/
     //console.log(res.admin, student._doc._id);
-    console.log(res);
-    return res; 
+   console.log(res);
+    //return res; 
    // return admin;
+   if(res.length==0){
+       return false;
+    }
+    return true;
 }
 module.exports = {getStudent:getStudent,getStudyGroup:getStudyGroup,isStudentMemberOfStudyGroup:isStudentMemberOfStudyGroup,isStudentAdminOfStudyGroup:isStudentAdminOfStudyGroup};
