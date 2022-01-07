@@ -19,15 +19,20 @@ router.get('/:location',async(req,res)=>{
     const result = await StudyGroup.model.find({location:req.params.location})
     res.json(result);
 });
+
+
 //Get list of study groups I am Part of
-router.get('/myGroups',async(req,res)=>{
+router.get('/groups/mygroups',async(req,res)=>{
+    
+    //console.log(req);
+    console.log("inside");
+    console.log("userID" , req.session.userId);
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("U are not logged in");
     //if I am a member, return in query!
-    const result = await StudyGroup.model.find({members:student._id}).select('_id name admin members location').populate('members','_id username firstname lastname email location').populate('admin','_id username firstname lastname email location');
-
-    console.dir(result);
-    res.json(result);
+   // const result = await StudyGroup.model.find({members:student._id});
+    const result2 = await StudyGroup.model.find({members:student._doc._id.toString()}).select('_id name admin members location').populate('members','_id username firstname lastname email location').populate('admin','_id username firstname lastname email location');
+    res.json(result2);
 });
 
 //create new study group

@@ -41,7 +41,7 @@ app.get('/',(req,res)=>{
 });
 app.use('/api/auth',authRoute);
 app.use('/api/studyGroups',studyGroupsRoute)
-app.use('/api/studyGroups/message',messageRoute)
+app.use('/api/message',messageRoute)
 app.listen(3000,()=>{
     console.log("Server started on port 3000");
 });
