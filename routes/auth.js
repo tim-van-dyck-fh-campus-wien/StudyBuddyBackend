@@ -21,18 +21,11 @@ router.get("/checkAuthentication",(req,res)=>{
 })
 
 //CHECK IF USER IS AUTHORIZED TO DO ADMIN STUFF
-router.post("/group/authorizationCheck", (req,res)=>{
-   try{
-       //wenn ich hier await mitdazuschreibe (weil async funtion), bekomme ich einen error? :/
-    let admin = await studentScripts.isStudentAdminOfStudyGroup(req.body.groupId, req.session.userId);
-   // console.log("result", admin);
-    if(admin === true){
+router.post("/authorizationCheck", (req,res)=>{
+    if(studentScripts.isStudentAdminOfStudyGroup(req.body.groupId, req.session.userId)){
         res.status(200).send();
-    } else if (admin=== false) {
+    } else {
         res.status(400).send();
-    }
- } catch (err){
-        res.status(500).send(err);
     }
 })
 
@@ -71,8 +64,7 @@ router.post('/register',async(req,res)=>{
                 //save student to database
                 const student = await newStudent.save();
                 req.session.loggedIn=true;
-                //mit _doc._id anstatt nur _id
-                req.session.userId = student._doc._id;
+                req.session.userId=student._id;
                 console.dir(student, req.session.loggedIn, req.session.userId, student._id)
                 res.status(200).json(student);
                     } catch (err){
@@ -102,25 +94,14 @@ router.post('/login',async(req,res)=>{
         
         !passwordValid && res.status(404).send("Email or password not correct");//If password does not match
 
-        //to get student ID for sessionID 
-        const studentID = student._doc._id.toString();
-       // console.log("id student davor", studentID);
-
-      //  console.log("studentId", student._doc._id);
         //EMAIL AND PASSWORD VALID
         req.session.loggedIn=true;
-        //req.sessionID = studentID;
-        req.session.userId = student._doc._id;
-       // req.session.userId=student._id;//Set the student id in the session
-        //req.session.sessionID=student._id;//Set the student id in the session
+        req.session.userId=student._id;//Set the student id in the session
         
-      //  console.dir(student);
-        console.log("student ID", studentID);
-        //console.log('SESSION id', req.sessionID);
-        console.log("session.userId", req.session.userId);
-        //res.status(200).json(student);
-        res.json(student);
-
+       // console.dir(student);
+        console.dir('SESSION id', req.session.userId, student._id);
+        res.status(200).json(student);
+        
         
     }catch(err){
         res.status(500).json(err);
