@@ -1,3 +1,4 @@
+const { restart } = require("nodemon");
 const Student = require("../Models/Student");
 const StudyGroup = require("../Models/StudyGroup");
 async function getStudent(id){//Get a the student corresponding to an id
@@ -24,9 +25,19 @@ student_id,
 }
 async function isStudentAdminOfStudyGroup(group_id,student_id){
     const res = await StudyGroup.model.find({_id:group_id,admin:student_id});
-    if(res){
-        return true;
+   /* const res = await getStudyGroup(group_id);
+    const student = await getStudent(student_id); 
+    console.log("Test",res.admin);
+    console.log("newStudentID", student._doc._id);
+    let admin = false; 
+    if(res.admin.toString() === student._doc._id.toString()){
+        console.log(res.admin, student._doc._id);
+        admin = true;
     }
-    return false;
+    console.log(admin);*/
+    //console.log(res.admin, student._doc._id);
+    console.log(res);
+    return res; 
+   // return admin;
 }
 module.exports = {getStudent:getStudent,getStudyGroup:getStudyGroup,isStudentMemberOfStudyGroup:isStudentMemberOfStudyGroup,isStudentAdminOfStudyGroup:isStudentAdminOfStudyGroup};
