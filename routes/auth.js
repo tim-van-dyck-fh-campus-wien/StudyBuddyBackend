@@ -103,27 +103,12 @@ router.post('/login',async(req,res)=>{
         const passwordValid = await bcrypt.compare(req.body.password,student.password);//Compare hash to transmitted password
         
         !passwordValid && res.status(404).send("Email or password not correct");//If password does not match
-
-        //to get student ID for sessionID 
-        const studentID = student._doc._id.toString();
-       // console.log("id student davor", studentID);
-
-      //  console.log("studentId", student._doc._id);
         //EMAIL AND PASSWORD VALID
         req.session.loggedIn=true;
-        //req.sessionID = studentID;
         req.session.userId = student._doc._id;
-       // req.session.userId=student._id;//Set the student id in the session
-        //req.session.sessionID=student._id;//Set the student id in the session
-        
-      //  console.dir(student);
-        console.log("student ID", studentID);
-        //console.log('SESSION id', req.sessionID);
-        console.log("session.userId", req.session.userId);
-        //res.status(200).json(student);
-        res.json(student);
-
-        
+ 
+        res.status(200).json(student);
+        //res.json(student);        
     }catch(err){
         res.status(500).json(err);
     }

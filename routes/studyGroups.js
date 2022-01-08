@@ -23,16 +23,14 @@ router.get('/:location',async(req,res)=>{
 
 //Get list of study groups I am Part of
 router.get('/groups/mygroups',async(req,res)=>{
-    
     //console.log(req);
-    console.log("inside");
-    console.log("userID" , req.session.userId);
+    //console.log("inside");
+    //console.log("userID" , req.session.userId);
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("U are not logged in");
     //if I am a member, return in query!
-   // const result = await StudyGroup.model.find({members:student._id});
-    const result2 = await StudyGroup.model.find({members:student._doc._id.toString()}).select('_id name admin members location').populate('members','_id username firstname lastname email location').populate('admin','_id username firstname lastname email location');
-    res.json(result2);
+    const result = await StudyGroup.model.find({members:student._doc._id.toString()}).select('_id name admin members location').populate('members','_id username firstname lastname email location').populate('admin','_id username firstname lastname email location');
+    res.json(result);
 });
 
 //create new study group
@@ -178,7 +176,9 @@ router.post('/joinRequestToGroup',async(req,res)=>{
 
 
     const joinRequest = new JoinRequest.model({
-        sender_id:student._id
+        sender_id:student._id,
+        //added for manually created message 
+        text:req.body.message
     });
     await joinRequest.save();
     await StudyGroup.model.updateOne({_id:req.body.groupId},{$addToSet:{joinRequests:joinRequest}});

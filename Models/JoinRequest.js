@@ -6,6 +6,15 @@ const JoinRequestSchema = new mongoose.Schema({
         ref:"Students",
         require:true
     },
+
+    //added for must criteria of manually created message with joinrq
+    text:{
+        type:String,
+        min:1,
+        max:500,
+        require:true
+    },
+    
 },{
     timestamps:true
 });
