@@ -169,7 +169,7 @@ router.post('/joinRequestToGroup',async(req,res)=>{
         return entry.sender_id == student._id.toString();
     });
     if((results.length>=1)){
-        return res.status(400).send("You already sent a join request!");
+        return res.status(402).send("You already sent a join request!");
     }
    // (results.length>=1) && res.status(400).send("You already sent a join request!");
 
@@ -187,9 +187,10 @@ router.post('/joinRequestToGroup',async(req,res)=>{
 });
 
 //get List Of Join Requests(For admin of a study Group)
-router.get('/joinRequests',async(req,res)=>{
+router.post('/getJoinRequests',async(req,res)=>{
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("You are not logged in");
+    //console.log(req.body.groupId);
     let studyGroup = await studentScripts.getStudyGroup(req.body.groupId);//find the corresponding study group
     !studyGroup&&res.status(404).send("The study group specified by the id was not found!");
     if(!checkIfStudentIsAdmin(studyGroup,student._id)){
@@ -203,7 +204,10 @@ router.get('/joinRequests',async(req,res)=>{
             select:{'firstname':1,'lastname':1,'username':1,'_id':1}
         }
     })
-    res.status(200).json(studyGroup.joinRequests);
+    //console.log(studyGroup.joinRequests);
+    res.json(studyGroup.joinRequests);
+    
+    //res.status(200).json(studyGroup.joinRequests);
 })
 //Admin functions
 //ADMIN accept/decline a join request by join request id
