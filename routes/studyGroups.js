@@ -222,9 +222,9 @@ router.post('/joinRequests',async(req,res)=>{
     !student && res.status(401).send("You are not logged in");
     let studyGroup = await studentScripts.getStudyGroup(req.body.handleRequest.groupId);//find the corresponding study group
     !studyGroup&&res.status(404).send("The study group specified by the id was not found!");
-   /* if(!checkIfStudentIsAdmin(studyGroup,student._id)){
+    if(!checkIfStudentIsAdmin(studyGroup,student._id)){
         res.status(401).send("You are not the admin of the study group!")
-    }*/
+    }
     //Get the specific join request matching the id
     let joinRequest = studyGroup.toObject().joinRequests;
     joinRequest= joinRequest.filter((entry)=>{
@@ -236,7 +236,7 @@ router.post('/joinRequests',async(req,res)=>{
        return res.status(404).send("The join request specified by the id could not be found");
     }
     console.log("Join Request");
-    console.log(joinRequest);
+    console.dir(joinRequest);
     if(req.body.handleRequest.accept){
     const studentToBeAdded = await studentScripts.getStudent(joinRequest.sender_id);
     if(!studentToBeAdded){
