@@ -173,13 +173,18 @@ router.post('/joinRequestToGroup',async(req,res)=>{
     }
    // (results.length>=1) && res.status(400).send("You already sent a join request!");
 
-
+    console.log(req.body.text);
 
     const joinRequest = new JoinRequest.model({
         sender_id:student._id,
-        //added for manually created message 
-        text:req.body.message
+
+
+        //added for manually created message --> wird aber noch nicht in joinRequest mitaufgenommen
+        text:req.body.text,
+
+        
     });
+   // console.log(joinRequest);
     await joinRequest.save();
     await StudyGroup.model.updateOne({_id:req.body.groupId},{$addToSet:{joinRequests:joinRequest}});
     const joinReqs= await StudyGroup.model.findById(req.body.groupId).joinRequests;
@@ -196,6 +201,7 @@ router.post('/getJoinRequests',async(req,res)=>{
     if(!checkIfStudentIsAdmin(studyGroup,student._id)){
         res.status(401).send("You are not the admin of the study group!")
     }
+
     studyGroup = await studyGroup.populate({
         path:'joinRequests',
         populate:{
@@ -204,7 +210,7 @@ router.post('/getJoinRequests',async(req,res)=>{
             select:{'firstname':1,'lastname':1,'username':1,'_id':1}
         }
     })
-    //console.log(studyGroup.joinRequests);
+    console.log(studyGroup.joinRequests);
     res.json(studyGroup.joinRequests);
     
     //res.status(200).json(studyGroup.joinRequests);
@@ -214,23 +220,24 @@ router.post('/getJoinRequests',async(req,res)=>{
 router.post('/joinRequests',async(req,res)=>{
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("You are not logged in");
-    let studyGroup = await studentScripts.getStudyGroup(req.body.groupId);//find the corresponding study group
+    let studyGroup = await studentScripts.getStudyGroup(req.body.handleRequest.groupId);//find the corresponding study group
     !studyGroup&&res.status(404).send("The study group specified by the id was not found!");
-    if(!checkIfStudentIsAdmin(studyGroup,student._id)){
+   /* if(!checkIfStudentIsAdmin(studyGroup,student._id)){
         res.status(401).send("You are not the admin of the study group!")
-    }
+    }*/
     //Get the specific join request matching the id
     let joinRequest = studyGroup.toObject().joinRequests;
     joinRequest= joinRequest.filter((entry)=>{
-        return entry._id==req.body.joinRequestId
+        return entry._id==req.body.handleRequest.joinRequestId
     });
+    
     joinRequest=joinRequest[0];
     if(!joinRequest){
        return res.status(404).send("The join request specified by the id could not be found");
     }
     console.log("Join Request");
-    console.dir(joinRequest);
-    if(req.body.accept){
+    console.log(joinRequest);
+    if(req.body.handleRequest.accept){
     const studentToBeAdded = await studentScripts.getStudent(joinRequest.sender_id);
     if(!studentToBeAdded){
         return res.status(404).send("The student to be added,specified in the join request, was not found");
@@ -239,14 +246,15 @@ router.post('/joinRequests',async(req,res)=>{
    // studyGroup.members.push(studentToBeAdded._id);//push into members array of study group
     //await studyGroup.save();
     //add to the list of members, but only if it is not yet in the list!
-    await StudyGroup.model.updateOne({_id:req.body.groupId},{$addToSet:{members:studentToBeAdded._id}});
+    await StudyGroup.model.updateOne({_id:req.body.handleRequest.groupId},{$addToSet:{members:studentToBeAdded._id}});
 }
-    studyGroup.joinRequests.pull({_id:req.body.joinRequestId});
+    studyGroup.joinRequests.pull({_id:req.body.handleRequest.joinRequestId});
     await studyGroup.save();
-    if(req.body.accept){
+    if(req.body.handleRequest.accept){
         res.status(200).send("The join request was accepted, and the student added");
     }
     res.status(200).send("The join request was declined");
 
 })
+
 module.exports=router;
