@@ -25,7 +25,6 @@ router.post("/group/authorizationCheck",async(req,res)=>{
    try{
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("U are not logged in");
-       //wenn ich hier await mitdazuschreibe (weil async funtion), bekomme ich einen error? :/
     let admin = await studentScripts.isStudentAdminOfStudyGroup(req.body.groupId, req.session.userId);
     console.log("result", admin);
     if(admin == true){
@@ -138,7 +137,7 @@ router.post('/updateStudentData', async(req,res)=>{
             student.location = req.body.location;
         }   
         await student.save();
-        console.log(student);
+        //console.log(student);
         res.status(200).send();
         } catch (err){
             console.dir(err);

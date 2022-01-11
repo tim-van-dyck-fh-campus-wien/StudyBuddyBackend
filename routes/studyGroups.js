@@ -33,6 +33,26 @@ router.get('/groups/mygroups',async(req,res)=>{
     res.json(result);
 });
 
+//Get a single study group
+router.post('/groups/singleGroup',async(req,res)=>{
+    const student = await studentScripts.getStudent(req.session.userId);
+    !student && res.status(401).send("U are not logged in");
+    //console.log(req); 
+    //console.log(req.body.groupId);
+    //if I am a member, return in query!
+    let studyGroup = await studentScripts.getStudyGroup(req.body.groupId);//find the corresponding study group
+    !studyGroup&&res.status(404).send("The study group specified by the id was not found!");
+   // studyGroup.select('_id name admin members location').populate('members','_id username firstname lastname').populate('admin','_id username firstname lastname');
+   studyGroup = await studyGroup.populate({
+    path:'members',
+    model:'Students',
+    select:{'firstname':1,'lastname':1,'username':1,'_id':1},
+})
+
+    res.json(studyGroup);
+});
+
+
 //create new study group
 router.post('/create',async(req,res)=>{
     //console.dir('Doing Method:', req);
@@ -57,6 +77,34 @@ router.post('/create',async(req,res)=>{
         res.status(500).json(err);
     }
 });
+
+//UPDATE GROUP METADATA 
+router.post('/updateGroupData',async(req,res)=>{
+    const student = await studentScripts.getStudent(req.session.userId);
+    !student && res.status(401).send("U are not logged in");
+    //.log(req);
+    let studyGroup = await studentScripts.getStudyGroup(req.body.groupId);//find the corresponding study group
+    !studyGroup&&res.status(404).send("The study group specified by the id was not found!");
+    console.log(checkIfStudentIsAdmin(studyGroup,student._id));
+    if(!checkIfStudentIsAdmin(studyGroup,student._id)){
+        res.status(401).send("You are not the admin of the study group!")
+    }
+    if (req.body.groupName !== ""){
+           studyGroup.name = req.body.groupName; 
+       }
+       if (req.body.location !== ""){
+           studyGroup.location = req.body.location; 
+       }
+       try {
+       await studyGroup.save();
+       //console.log(studyGroup);
+       res.status(200).send();
+       } catch (err){
+           console.dir(err);
+           res.status(400).send();
+       }
+});
+
 
 function checkIfStudentIsAdmin(studyGroup,studentId){
     if(studyGroup.admin.equals(studentId)){
@@ -177,12 +225,7 @@ router.post('/joinRequestToGroup',async(req,res)=>{
 
     const joinRequest = new JoinRequest.model({
         sender_id:student._id,
-
-
-        //added for manually created message --> wird aber noch nicht in joinRequest mitaufgenommen
         text:req.body.text,
-
-        
     });
    // console.log(joinRequest);
     await joinRequest.save();
@@ -210,7 +253,7 @@ router.post('/getJoinRequests',async(req,res)=>{
             select:{'firstname':1,'lastname':1,'username':1,'_id':1}
         }
     })
-    console.log(studyGroup.joinRequests);
+   // console.log(studyGroup.joinRequests);
     res.json(studyGroup.joinRequests);
     
     //res.status(200).json(studyGroup.joinRequests);
