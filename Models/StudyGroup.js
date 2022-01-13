@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Student = require('./Student');
 const Message = require('./Message');
 const JoinRequest = require('./JoinRequest');
+const { stringify } = require('nodemon/lib/utils');
 const StudyGroupSchema = new mongoose.Schema({
     name:{
         type:String,
@@ -39,6 +40,17 @@ const StudyGroupSchema = new mongoose.Schema({
         /**min:1,
         max:23,
         default:1*/
+    },
+    //optional topic of the study group
+    topic:{
+        type:String,
+        default:"",
+        max:50
+    },
+    description:{
+        type:String,
+        max:150,
+        require:true
     }
 
 

@@ -8,7 +8,7 @@ const JoinRequest=require('../Models/JoinRequest');
 router.get('/',async(req,res)=>{
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("U are not logged in");
-    const result = await StudyGroup.model.find().select('_id name admin members location').populate('members','_id username firstname lastname email location').populate('admin','_id username firstname lastname email location');
+    const result = await StudyGroup.model.find().select('_id name admin members location topic description').populate('members','_id username firstname lastname email location').populate('admin','_id username firstname lastname email location');
     res.json(result);
 });
 
@@ -29,7 +29,7 @@ router.get('/groups/mygroups',async(req,res)=>{
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("U are not logged in");
     //if I am a member, return in query!
-    const result = await StudyGroup.model.find({members:student._doc._id.toString()}).select('_id name admin members location').populate('members','_id username firstname lastname email location').populate('admin','_id username firstname lastname email location');
+    const result = await StudyGroup.model.find({members:student._doc._id.toString()}).select('_id name admin members location topic description').populate('members','_id username firstname lastname email location').populate('admin','_id username firstname lastname email location');
     res.json(result);
 });
 
@@ -64,12 +64,18 @@ router.post('/create',async(req,res)=>{
     const admin = student._id;//admin is the creator of the group
     const members = [student._id];//the only member is the admin initially
     const location = req.body.location;
+    const topic = req.body.topic;
+  
+    const description=req.body.description;
     const newStudyGroup = StudyGroup.model({
         name:name,
         admin:admin,
         members:members,
-        location:location
+        location:location,
+        topic:topic,
+        description:description
     });
+    
     try{
         const studyGroup = await newStudyGroup.save();
         res.status(200).json(studyGroup);
