@@ -101,6 +101,13 @@ router.post('/updateGroupData',async(req,res)=>{
        if (req.body.location !== ""){
            studyGroup.location = req.body.location; 
        }
+       if (req.body.description !== ""){
+        studyGroup.description = req.body.description; 
+    }
+    if (req.body.topic !== ""){
+        studyGroup.topic = req.body.topic; 
+    }
+    console.dir(studyGroup);
        try {
        await studyGroup.save();
        //console.log(studyGroup);
