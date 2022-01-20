@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Student = require('./Student');
 const Message = require('./Message');
 const JoinRequest = require('./JoinRequest');
+const Appointment = require('./Appointment');
 const { stringify } = require('nodemon/lib/utils');
 const StudyGroupSchema = new mongoose.Schema({
     name:{
@@ -20,10 +21,11 @@ const StudyGroupSchema = new mongoose.Schema({
         min:1,
         unique:false,
     }],
-   /* appointments:{
+    appointments:{
         type:[Appointment.schema],
         require:true,
-    }*/
+         default:[]
+    },
     messages:{
         type:[Message.schema],
         require:true,

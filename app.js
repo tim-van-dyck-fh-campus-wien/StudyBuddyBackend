@@ -17,6 +17,7 @@ const authRoute = require('./routes/auth');
 const studyGroupsRoute = require('./routes/studyGroups');
 const messageRoute = require('./routes/message');
 const imagesRoute = require('./routes/images');
+const appointmentsRoute = require('./routes/appointments');
 mongoose.connect(process.env.MONGO_URL,{useNewUrlParser:true, useUnifiedTopology:true}).then( () => console.log("connected to DB."))
 .catch( err => console.log(err));
 //middleware
@@ -46,6 +47,7 @@ app.use('/api/auth',authRoute);
 app.use('/api/studyGroups',studyGroupsRoute)
 app.use('/api/message',messageRoute)
 app.use('/api/images',imagesRoute);
+app.use('/api/appointments',appointmentsRoute);
 app.listen(3000,()=>{
     console.log("Server started on port 3000");
 });

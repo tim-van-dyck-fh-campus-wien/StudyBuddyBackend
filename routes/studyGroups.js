@@ -48,7 +48,7 @@ router.post('/groups/singleGroup',async(req,res)=>{
     model:'Students',
     select:{'firstname':1,'lastname':1,'username':1,'_id':1},
 })
-
+    //console.log(studyGroup);
     res.json(studyGroup);
 });
 
