@@ -17,6 +17,8 @@ router.get('/:location',async(req,res)=>{
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("U are not logged in");
     const result = await StudyGroup.model.find({location:req.params.location})
+        .select('_id name members location topic description icon')
+        .populate('members','username firstname lastname email');
     console.log(result);
     res.status(200).json(result);
 });
