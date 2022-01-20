@@ -65,6 +65,7 @@ router.post('/create',async(req,res)=>{
     const members = [student._id];//the only member is the admin initially
     const location = req.body.location;
     const topic = req.body.topic;
+    const icon = req.body.icon;
   
     const description=req.body.description;
     const newStudyGroup = StudyGroup.model({
@@ -73,7 +74,8 @@ router.post('/create',async(req,res)=>{
         members:members,
         location:location,
         topic:topic,
-        description:description
+        description:description,
+        icon:icon
     });
     
     try{
