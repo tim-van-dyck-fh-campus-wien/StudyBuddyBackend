@@ -51,6 +51,11 @@ const StudyGroupSchema = new mongoose.Schema({
         type:String,
         max:150,
         require:true
+    },
+    icon:{//relative url to the icon used by the group
+        type:String,
+        require:true,
+        default:'/group/pc.jpg'
     }
 
 

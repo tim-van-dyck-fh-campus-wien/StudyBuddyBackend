@@ -16,6 +16,7 @@ dotenv.config();
 const authRoute = require('./routes/auth');
 const studyGroupsRoute = require('./routes/studyGroups');
 const messageRoute = require('./routes/message');
+const imagesRoute = require('./routes/images');
 mongoose.connect(process.env.MONGO_URL,{useNewUrlParser:true, useUnifiedTopology:true}).then( () => console.log("connected to DB."))
 .catch( err => console.log(err));
 //middleware
@@ -31,6 +32,8 @@ app.use(session({//https://www.youtube.com/watch?v=J1qXK66k1y4
         maxAge:1000*60*60*24//24 hours
     }
 }))
+//Serve icons
+app.use(express.static('Images'));
 app.use(cors({
     origin:["http://localhost:4200"
 ], credentials: true
@@ -42,6 +45,7 @@ app.get('/',(req,res)=>{
 app.use('/api/auth',authRoute);
 app.use('/api/studyGroups',studyGroupsRoute)
 app.use('/api/message',messageRoute)
+app.use('/api/images',imagesRoute);
 app.listen(3000,()=>{
     console.log("Server started on port 3000");
 });
