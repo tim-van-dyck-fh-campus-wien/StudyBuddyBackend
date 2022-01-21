@@ -18,6 +18,9 @@ router.get('/groupImgList',async(req,res)=>{
         next();
     })
     walker.on('end', ()=>{
+        if(images[0]=="/group/.DS_Store"){
+            images.splice(0,1);
+        }
         res.json(images);
     })
 })

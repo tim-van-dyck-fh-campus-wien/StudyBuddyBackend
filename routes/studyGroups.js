@@ -251,6 +251,37 @@ router.post('/joinRequestToGroup',async(req,res)=>{
     const joinReqs= await StudyGroup.model.findById(req.body.groupId).joinRequests;
     res.status(200).json(joinReqs);
 });
+//Checks if the student has already sent a request to the group/is already a member of the group
+router.post('/isStudentAbleToSendJoinRequest', async(req,res)=>{
+    const student = await studentScripts.getStudent(req.session.userId);
+    //!student && res.status(401).send("You are not logged in");
+    if(!student){
+        return res.status(401).send("You are not logged in");
+    }
+    const studyGroup = await studentScripts.getStudyGroup(req.body.groupId);//find the corresponding study group
+    //!studyGroup&&res.status(404).send("The study group specified by the id was not found!");
+    if(!studyGroup){
+        return res.status(404).send("The study group specified by the id was not found!");
+    }
+    const studentIsMember = await studentScripts.isStudentMemberOfStudyGroup(req.body.groupId,student._id);
+    
+    //studentIsMember&&res.status(400).send("You are already a member of the study group!");
+    if(studentIsMember){
+        return res.status(400).send("You are already a member of the study group!");
+    }
+    //const alreadySentJoinReq= await StudyGroup.model.find({_id:req.body.groupId},{joinRequests:{$elemMatch:{sender_id:student._id}}});
+    
+    //Check if logged in user already sent a join request
+    let results =studyGroup.toObject().joinRequests;
+    results = results.filter((entry)=>{
+        //return entry.sender_id.equals(student._id);
+        return entry.sender_id == student._id.toString();
+    });
+    if((results.length>=1)){
+        return res.status(402).send("You already sent a join request!");
+    }
+    res.status(200).send("Able to send a join request");
+})
 
 //get List Of Join Requests(For admin of a study Group)
 router.post('/getJoinRequests',async(req,res)=>{
