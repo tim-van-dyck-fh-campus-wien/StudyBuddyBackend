@@ -145,6 +145,24 @@ router.post('/updateStudentData', async(req,res)=>{
         }
     })
 
+
+    //HIDE OR SHOW PERSONAL DATA IN PUBLIC LIST
+router.post('/hideData', async(req,res)=>{
+        //console.dir(req); 
+        try {
+             //search the student in the database by the userID
+            let student = await studentScripts.getStudent(req.session.userId); 
+            //console.log(student);
+            student.hide = req.body.hideSetting;
+            await student.save();
+            //console.log(student);
+            res.status(200).send();
+            } catch (err){
+                console.dir(err);
+                res.status(400).send();
+            }
+        })
+
 router.get('/logout', (req,res)=>{
     if(req.session.loggedIn){
    // console.dir(req.session.loggedIn);

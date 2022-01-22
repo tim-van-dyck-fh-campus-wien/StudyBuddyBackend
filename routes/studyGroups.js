@@ -8,7 +8,8 @@ const JoinRequest=require('../Models/JoinRequest');
 router.get('/',async(req,res)=>{
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("U are not logged in");
-    const result = await StudyGroup.model.find().select('_id name admin members location topic description icon').populate('members','_id username firstname lastname email location').populate('admin','_id username firstname lastname email location');
+   // const result = await StudyGroup.model.find().select('_id name admin members location topic description icon').populate('members','_id username firstname lastname email location').populate('admin','_id username firstname lastname email location');
+    const result = await StudyGroup.model.find({ $or:[ {'hide':"false"}, {'hide':false} ]}).select('_id name admin members location topic description icon hide').populate('members','_id username firstname lastname email location').populate('admin','_id username firstname lastname email location');  
     res.json(result);
 });
 
@@ -16,8 +17,8 @@ router.get('/',async(req,res)=>{
 router.get('/:location',async(req,res)=>{
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("U are not logged in");
-    const result = await StudyGroup.model.find({location:req.params.location})
-        .select('_id name members location topic description icon')
+    const result = await StudyGroup.model.find({location:req.params.location, $or:[ {'hide':"false"}, {'hide':false} ]})
+        .select('_id name members location topic description icon hide')
         .populate('members','username firstname lastname email');
     console.log(result);
     res.status(200).json(result);
@@ -32,7 +33,7 @@ router.get('/groups/mygroups',async(req,res)=>{
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("U are not logged in");
     //if I am a member, return in query!
-    const result = await StudyGroup.model.find({members:student._doc._id.toString()}).select('_id name admin members location topic description appointments icon').populate('members','_id username firstname lastname email location').populate('admin','_id username firstname lastname email location');
+    const result = await StudyGroup.model.find({members:student._doc._id.toString()}).select('_id name admin members location topic description appointments icon hide').populate('members','_id username firstname lastname email location').populate('admin','_id username firstname lastname email location');
     res.json(result);
 });
 
@@ -189,6 +190,24 @@ router.post('/deleteThisStudyGroup', async(req,res)=>{
 
     await StudyGroup.model.deleteOne({_id:studyGroup._id});
     res.status(200).send("Successfully deleted Study Group.")
+})
+
+//change hide settings 
+router.post('/hideThisGroup', async(req,res)=>{
+    //console.log(req);
+    console.log(req.body.groupId); 
+    //console.log(req.body.newAdminId);
+    const student = await studentScripts.getStudent(req.session.userId);
+    !student && res.status(401).send("You are not logged in");
+    let studyGroup = await studentScripts.getStudyGroup(req.body.groupId);//find the corresponding study group
+    !studyGroup&&res.status(404).send("The study group specified by the id was not found!");
+    if(!checkIfStudentIsAdmin(studyGroup,student._id)){
+        res.status(401).send("You are not the admin of the study group!")
+    }
+    studyGroup.hide = req.body.hideSetting; 
+    await studyGroup.save();
+    console.log(studyGroup);
+    res.status(200).send("Successfully updated Study Group visibility.")
 })
 
 

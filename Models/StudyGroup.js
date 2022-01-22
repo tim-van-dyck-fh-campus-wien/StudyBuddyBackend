@@ -55,7 +55,13 @@ const StudyGroupSchema = new mongoose.Schema({
         type:String,
         require:true,
         default:'/group/pc.jpg'
-    }
+    }, 
+    hide:{
+        type:Boolean,
+        require:true,
+        default:false
+    },
+
 
 
 },{
