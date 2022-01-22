@@ -152,6 +152,44 @@ router.patch('/addMember', async(req,res)=>{
 })
 
 
+//a new Admin can be selected 
+router.post('/selectNewAdmin', async(req,res)=>{
+    //console.log(req);
+    console.log(req.body.groupId); 
+    console.log(req.body.newAdminId);
+    const student = await studentScripts.getStudent(req.session.userId);
+    !student && res.status(401).send("You are not logged in");
+    const studyGroup = await studentScripts.getStudyGroup(req.body.groupId);//find the corresponding study group
+    !studyGroup&&res.status(404).send("The study group specified by the id was not found!");
+    if(!checkIfStudentIsAdmin(studyGroup,student._id)){
+        res.status(401).send("You are not the admin of the study group!")
+    }
+    const newAdmin = await studentScripts.getStudent(req.body.newAdminId);
+    !newAdmin&&res.status(404).send("The student to be selected was not found");
+    if(newAdmin._id==student._id){
+        res.status(401).send("You are already the admin.");
+    }
+    await StudyGroup.model.updateOne({_id:studyGroup._id},{admin:req.body.newAdminId})
+    res.status(200).send("The admin has been updated!")
+})
+
+
+//admin can delete a studyGroup
+router.post('/deleteThisStudyGroup', async(req,res)=>{
+    //console.log(req);
+    console.log(req.body.groupId); 
+    //console.log(req.body.newAdminId);
+    const student = await studentScripts.getStudent(req.session.userId);
+    !student && res.status(401).send("You are not logged in");
+    let studyGroup = await studentScripts.getStudyGroup(req.body.groupId);//find the corresponding study group
+    !studyGroup&&res.status(404).send("The study group specified by the id was not found!");
+    if(!checkIfStudentIsAdmin(studyGroup,student._id)){
+        res.status(401).send("You are not the admin of the study group!")
+    }
+
+    await StudyGroup.model.deleteOne({_id:studyGroup._id});
+    res.status(200).send("Successfully deleted Study Group.")
+})
 
 
 router.delete('/deleteMember',async(req,res)=>{
@@ -172,6 +210,8 @@ router.delete('/deleteMember',async(req,res)=>{
     }})
     res.status(200).send("Student was removed from Group!")
 })
+
+
 //used to leave a study group, the logged in student is a member of
 router.delete('/leaveStudyGroup',async(req,res)=>{
     const student = await studentScripts.getStudent(req.session.userId);

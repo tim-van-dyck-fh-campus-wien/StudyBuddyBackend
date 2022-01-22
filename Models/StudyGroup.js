@@ -39,9 +39,6 @@ const StudyGroupSchema = new mongoose.Schema({
     location:{
         type:String,
         require:true,
-        /**min:1,
-        max:23,
-        default:1*/
     },
     //optional topic of the study group
     topic:{
