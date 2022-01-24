@@ -153,9 +153,9 @@ router.post('/hideData', async(req,res)=>{
              //search the student in the database by the userID
             let student = await studentScripts.getStudent(req.session.userId); 
             //console.log(student);
-            student.hide = req.body.hideSetting;
+            student.hideData = req.body.hideData;
             await student.save();
-            //console.log(student);
+            console.log(student);
             res.status(200).send();
             } catch (err){
                 console.dir(err);

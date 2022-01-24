@@ -40,7 +40,6 @@ const StudentSchema = new mongoose.Schema({//Defines the schema for DB entrys in
         unique:true
     },
     location:{//District number in vienna
-        //changed to string to reduce error possibilities 
         type:String,
         required:true,
     },
@@ -48,6 +47,12 @@ const StudentSchema = new mongoose.Schema({//Defines the schema for DB entrys in
         type:Number,
         required:true,
         min:2022
+    }, 
+    //test für hiding metadata in profile
+    hideData:{ 
+        type:Boolean, 
+        required:true, 
+        default:false,
     }
 },{
     timestamps:true
