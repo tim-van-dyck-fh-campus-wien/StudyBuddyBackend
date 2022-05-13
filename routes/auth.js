@@ -8,15 +8,21 @@ router.get('/',(req,res)=>{
     if(req.session.loggedIn){
         res.status(200);
     }
-    res.send('user auth works');
+    res.json({text:"user auth works"});
 });
 
 //Check if user with corresponding session id, is logged in!
-router.get("/checkAuthentication",(req,res)=>{
+router.get("/checkAuthentication",async (req,res)=>{
+   try{
     if(req.session.loggedIn){
-        res.status(200).send();
+        const student = await studentScripts.getStudent(req.session.userId);
+        !student && res.status(404).send()
+        res.status(200).json(student);
     }else{
         res.status(401).send();
+    }}
+    catch{
+        res.status(500).send()
     }
 })
 
