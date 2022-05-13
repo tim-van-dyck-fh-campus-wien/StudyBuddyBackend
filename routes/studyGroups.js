@@ -10,6 +10,7 @@ router.get('/',async(req,res)=>{
     !student && res.status(401).send("U are not logged in");
    // const result = await StudyGroup.model.find().select('_id name admin members location topic description icon').populate('members','_id username firstname lastname email location').populate('admin','_id username firstname lastname email location');
     const result = await StudyGroup.model.find({ $or:[ {'hide':"false"}, {'hide':false} ]}).select('_id name admin members location topic description icon hide').populate('members','_id username firstname lastname email location hideData').populate('admin','_id username firstname lastname email location');  
+    //console.log(result)
     res.json(result);
 });
 
@@ -39,6 +40,7 @@ router.get('/groups/mygroups',async(req,res)=>{
 
 //Get a single study group
 router.post('/groups/singleGroup',async(req,res)=>{
+    console.log(req.body.groupId)
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("U are not logged in");
     //console.log(req); 
@@ -47,18 +49,36 @@ router.post('/groups/singleGroup',async(req,res)=>{
     let studyGroup = await studentScripts.getStudyGroup(req.body.groupId);//find the corresponding study group
     !studyGroup&&res.status(404).send("The study group specified by the id was not found!");
    // studyGroup.select('_id name admin members location').populate('members','_id username firstname lastname').populate('admin','_id username firstname lastname');
+   
+   //added populate statements for admin & messages.sender_id - else not usable in App 
    studyGroup = await studyGroup.populate({
     path:'members',
     model:'Students',
-    select:{'firstname':1,'lastname':1,'username':1,'_id':1},
+    select:{'firstname':1,'lastname':1,'username':1,'_id':1, 'email':1},
 })
-    //console.log(studyGroup);
+    studyGroup = await studyGroup.populate({
+        path:'admin', 
+        model:'Students', 
+        select:{'_id':1,  'username':1, 'firstname':1,'lastname':1, 'email':1 ,'location':1}
+
+    })
+
+    studyGroup = await studyGroup.populate({
+        path:'messages.sender_id', 
+        model:'Students', 
+        select:{'_id':1,  'username':1, 'firstname':1,'lastname':1, 'email':1 ,'location':1}
+
+    })
+
+    console.log(studyGroup);
+   // console.log(res.json(studyGroup))
     res.json(studyGroup);
 });
 
 
 //create new study group
 router.post('/create',async(req,res)=>{
+    console.log(req.body)
     //console.dir('Doing Method:', req);
     //console.dir(req.session.userId);
     const student = await studentScripts.getStudent(req.session.userId);
@@ -84,7 +104,9 @@ router.post('/create',async(req,res)=>{
     
     try{
         const studyGroup = await newStudyGroup.save();
-        res.status(200).json(studyGroup);
+        const result = await StudyGroup.model.find({ $or:[ {'hide':"false"}, {'hide':false} ]}).select('_id');  
+        console.log(group)
+        res.json(group);
     }catch(err){
         res.status(500).json(err);
     }
