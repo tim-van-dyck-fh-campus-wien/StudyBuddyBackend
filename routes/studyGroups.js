@@ -105,6 +105,7 @@ router.post('/create',async(req,res)=>{
     try{
         const studyGroup = await newStudyGroup.save();
         const result = await StudyGroup.model.find({ $or:[ {'hide':"false"}, {'hide':false} ]}).select('_id');  
+        let group = result.pop()  //just added the group, so it should be at the last place in list. Not great for bigger environments of course. 
         console.log(group)
         res.json(group);
     }catch(err){
