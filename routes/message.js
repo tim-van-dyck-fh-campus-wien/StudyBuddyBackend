@@ -6,7 +6,7 @@ const Messages = require('../Models/Message')
 //Used to send a message to a study group!
 //message specified in the body!
 router.post('/newmessage',async(req,res)=>{
-    console.log(req);
+    console.log(req.body);
 
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("You are not logged in");
@@ -23,7 +23,13 @@ router.post('/newmessage',async(req,res)=>{
     await message.save();
     studyGroup.messages.push(message);
     await studyGroup.save();
-    res.status(200).json(studyGroup);
+    studyGroup = await studyGroup.populate({
+        path:'messages.sender_id', 
+        model:'Students', 
+        select:{'_id':1,  'username':1, 'firstname':1,'lastname':1, 'email':1 ,'location':1}
+
+    })
+    res.status(200).json(studyGroup.messages);
 }catch(err){
     res.status(500).json(err);
 }
@@ -57,7 +63,7 @@ router.post('/group',async(req,res)=>{
         let messages = studyGroup.messages;
         //messages =await messages.sort({createdAt:'desc'})
 
-        //console.dir(messages);
+        console.dir(messages);
         res.status(200).send(messages);
 
 
