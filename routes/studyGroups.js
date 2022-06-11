@@ -243,7 +243,7 @@ router.delete('/deleteMember',async(req,res)=>{
         res.status(401).send("You are not the admin of the study group!")
     }
     const studentToBeRemoved = await studentScripts.getStudent(req.body.newMemberId);
-    !studentToBeRemoved&&res.status(404).send("The student to be added was not found");
+    !studentToBeRemoved&&res.status(404).send("The student to be removed was not found");
     if(studentToBeRemoved._id==student._id){//Admin can't remove himself from the group, as there would be no admin
         res.status(401).send("You can't remove yourself, as there would be no admin!");
     }
