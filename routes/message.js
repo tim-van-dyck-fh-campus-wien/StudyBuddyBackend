@@ -23,20 +23,23 @@ router.post('/newmessage',async(req,res)=>{
     await message.save();
     studyGroup.messages.push(message);
     await studyGroup.save();
-    studyGroup = await studyGroup.populate({
+    /*studyGroup = await studyGroup.populate({
         path:'messages.sender_id', 
         model:'Students', 
         select:{'_id':1,  'username':1, 'firstname':1,'lastname':1, 'email':1 ,'location':1}
 
-    })
-    res.status(200).json(studyGroup.messages);
+    })*/
+    console.log(studyGroup)
+    res.status(200).send();
 }catch(err){
+    console.log(err)
     res.status(500).json(err);
 }
 });
 //Used to get the list of messages
 //das ist post, weil ich sonst die ID nicht mitschicken kann über den browser
-router.post('/group',async(req,res)=>{
+router.post('/group/mess',async(req,res)=>{
+    console.log(req.body)
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("You are not logged in");
     //console.log("get ID", req.body.groupId);
@@ -45,26 +48,26 @@ router.post('/group',async(req,res)=>{
     const studentIsMember = await studentScripts.isStudentMemberOfStudyGroup(req.body.groupId,student._id);
     !studentIsMember&&req.status(400).send("You are not a member of the study group!");
    
-        //studyGroup = await studyGroup.messages.populate('sender_id');
-       console.log(StudyGroup.model.findById(req.body.groupId).messages)
-       /* StudyGroup.model.findById(req.body.groupId).messages.populate('sender_id').then(res =>{
-            console.dir(res);
-        }).catch(err=>{
-            console.dir(err);
-        })*/
-        studyGroup = await studyGroup.populate({
-            path:'messages',
-            populate:{
-                path:'sender_id',
-                model:'Students',
-                select:{'firstname':1,'lastname':1,'email':1,'username':1}
-            }
-        });
-        let messages = studyGroup.messages;
-        //messages =await messages.sort({createdAt:'desc'})
+    //studyGroup = await studyGroup.messages.populate('sender_id');
+    console.log(StudyGroup.model.findById(req.body.groupId).messages)
+    /* StudyGroup.model.findById(req.body.groupId).messages.populate('sender_id').then(res =>{
+        console.dir(res);
+    }).catch(err=>{
+        console.dir(err);
+    })*/
+    studyGroup = await studyGroup.populate({
+        path:'messages',
+        populate:{
+            path:'sender_id',
+            model:'Students',
+            select:{'firstname':1,'lastname':1,'email':1,'username':1}
+        }
+    });
+    let messages = studyGroup.messages;
+    //messages =await messages.sort({createdAt:'desc'})
 
-        console.dir(messages);
-        res.status(200).send(messages);
+    console.log(messages);
+    res.status(200).json(messages);
 
 
         //res.status(500).json(err);

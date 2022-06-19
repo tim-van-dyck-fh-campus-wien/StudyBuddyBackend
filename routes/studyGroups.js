@@ -234,7 +234,8 @@ router.post('/hideThisGroup', async(req,res)=>{
 })
 
 
-router.delete('/deleteMember',async(req,res)=>{
+router.post('/deleteMember',async(req,res)=>{
+    console.log(req.body)
     const student = await studentScripts.getStudent(req.session.userId);
     !student && res.status(401).send("You are not logged in");
     const studyGroup = await studentScripts.getStudyGroup(req.body.groupId);//find the corresponding study group
